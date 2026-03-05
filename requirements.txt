@@ -1,0 +1,83 @@
+# =============================================================================
+# Real-Time Crowd Behavior Analysis System
+# requirements.txt
+#
+# Python 3.11+ required
+#
+# Install:
+#   pip install -r requirements.txt
+#
+# For GPU inference (CUDA 11.8):
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+#   then: pip install -r requirements.txt
+# =============================================================================
+
+
+# ── Computer Vision ───────────────────────────────────────────────────────────
+
+# YOLOv8 detection backbone (includes torchvision, ultralytics model hub)
+ultralytics>=8.2.0,<9.0.0
+
+# OpenCV — frame capture, heatmap overlay, JPEG encode/decode
+opencv-python>=4.9.0,<5.0.0
+
+# DeepSORT tracking (Kalman filter + re-ID embedder)
+deep-sort-realtime>=1.3.2,<2.0.0
+
+
+# ── Deep Learning ─────────────────────────────────────────────────────────────
+
+# PyTorch CPU wheel (default — replace with CUDA build for GPU inference)
+# See: https://pytorch.org/get-started/locally/
+torch>=2.2.0,<3.0.0
+
+
+# ── Numerical / Scientific ────────────────────────────────────────────────────
+
+numpy>=1.26.0,<2.0.0
+
+# Optional fallback blur kernel in crowd_density.py when cv2 is unavailable
+scipy>=1.12.0,<2.0.0
+
+
+# ── Web Framework ─────────────────────────────────────────────────────────────
+
+# FastAPI + Starlette (WebSocket, StaticFiles, middleware, exception handlers)
+fastapi>=0.111.0,<1.0.0
+
+# ASGI server (production entry-point: uvicorn app.api.server:app)
+uvicorn[standard]>=0.29.0,<1.0.0
+
+
+# ── Configuration ─────────────────────────────────────────────────────────────
+
+# Pydantic v2 — data validation for API schemas and settings
+pydantic>=2.7.0,<3.0.0
+
+# pydantic-settings — BaseSettings with .env file and env-var support
+pydantic-settings>=2.2.0,<3.0.0
+
+# YAML — logging.yaml and model_config.yaml loading
+PyYAML>=6.0.1,<7.0.0
+
+
+# ── Data & Evaluation ────────────────────────────────────────────────────────
+
+# sklearn metrics in scripts/evaluate_behavior.py
+# (accuracy, precision, recall, F1, classification_report)
+scikit-learn>=1.4.0,<2.0.0
+
+# joblib — optional ML model serialisation in MLBehaviorClassifier
+joblib>=1.4.0,<2.0.0
+
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+
+# Core test runner
+pytest>=8.2.0,<9.0.0
+
+# Async test support (used by API / WebSocket tests)
+pytest-asyncio>=0.23.0,<1.0.0
+
+# ASGI test client used in test_api.py
+httpx>=0.27.0,<1.0.0
