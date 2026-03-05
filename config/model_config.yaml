@@ -1,0 +1,133 @@
+# =============================================================================
+# config/model_config.yaml
+# ML model hyperparameters — externalised so tuning never requires code changes.
+#
+# Values here are DEFAULTS.  They are overridden by environment variables
+# (see .env.example) which take precedence at runtime.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# YOLOv8 Detection
+# -----------------------------------------------------------------------------
+detection:
+  # Checkpoint — relative to project root.
+  # Sizes (n < s < m < l < x): accuracy ↑, throughput ↓
+  weights: models/yolov8n.pt
+
+  # Inference resolution — must be a multiple of 32.
+  input_size: 640
+
+  # Score gate before NMS.
+  confidence_threshold: 0.45
+
+  # NMS overlap gate.
+  iou_threshold: 0.45
+
+  # COCO class IDs to keep.  0 = person.
+  target_classes: [0]
+
+  # FP16 inference — only effective when DEVICE=cuda.
+  half_precision: true
+
+  # Hard cap on bounding boxes returned per frame.
+  max_detections: 300
+
+  # Augmented inference (test-time augmentation) — accurate but slow.
+  augment: false
+
+
+# -----------------------------------------------------------------------------
+# DeepSORT Multi-Object Tracking
+# -----------------------------------------------------------------------------
+tracking:
+  # Frames without a match before a track is deleted.
+  max_age: 30
+
+  # Frames with a match before a track transitions to Confirmed.
+  min_hits: 3
+
+  # IoU threshold in the Hungarian assignment matrix.
+  iou_threshold: 0.3
+
+  # Cosine distance ceiling for appearance re-identification.
+  max_cosine_distance: 0.4
+
+  # Re-ID gallery size per track (None = unlimited).
+  nn_budget: 100
+
+  # Kalman filter process noise covariance scaling.
+  # Increase for faster-moving objects.
+  process_noise_scale: 1.0
+
+  # Kalman filter measurement noise covariance scaling.
+  measurement_noise_scale: 1.0
+
+
+# -----------------------------------------------------------------------------
+# Re-Identification Encoder (OSNet)
+# -----------------------------------------------------------------------------
+reid:
+  weights: models/osnet_x0_25_msmt17.pt
+
+  # Embedding vector length produced by the encoder.
+  feature_dim: 512
+
+  # Input crop size fed to the re-ID model.
+  crop_height: 256
+  crop_width:  128
+
+  # Batch size for embedding extraction (tune to GPU VRAM).
+  batch_size: 32
+
+
+# -----------------------------------------------------------------------------
+# Behaviour Analysis
+# -----------------------------------------------------------------------------
+behavior:
+
+  velocity:
+    # EMA smoothing factor: 0 = no smoothing, 1 = frozen.
+    smoothing_alpha: 0.3
+
+    # Pixels-per-frame speed above which a track is 'running'.
+    run_threshold_px_per_frame: 15.0
+
+    # Minimum track age (frames) before velocity is trusted.
+    min_track_age_frames: 5
+
+  anomaly:
+    # Z-score deviation from crowd mean velocity to flag a track.
+    zscore_threshold: 2.5
+
+    # Minimum confirmed tracks required for statistical comparison.
+    min_population: 5
+
+    # Mahalanobis distance threshold (alternative to z-score).
+    mahalanobis_threshold: 3.0
+
+  density:
+    # Grid dimensions for zone partitioning.
+    zone_rows: 4
+    zone_cols: 4
+
+    # Persons per zone above which a density alert fires.
+    alert_threshold: 10
+
+    # Gaussian kernel bandwidth for heatmap generation.
+    heatmap_bandwidth: 30
+
+  event_classification:
+    # Fraction of confirmed tracks that must be anomalous to fire PANIC.
+    panic_min_anomalous_fraction: 0.4
+
+    # Pixel radius within which two anomalous tracks trigger FIGHT.
+    fight_proximity_px: 80.0
+
+    # Mean speed must exceed (baseline × multiplier) to trigger CROWD_SURGE.
+    surge_velocity_multiplier: 2.0
+
+    # Minimum seconds between repeated alerts of the same category.
+    alert_cooldown_s: 5.0
+
+    # Minimum frames an event condition must persist before being classified.
+    event_min_duration_frames: 3
